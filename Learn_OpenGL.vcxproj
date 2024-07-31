@@ -137,6 +137,8 @@
     <ClCompile Include="vendor\lib\stb.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="assets\Fragment_core.glsl" />
+    <None Include="assets\Vertex_core.glsl" />
     <None Include="glfw3.dll" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
