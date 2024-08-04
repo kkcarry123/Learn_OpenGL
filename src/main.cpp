@@ -2,10 +2,24 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+//#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
+
 #include <fstream>
 #include <sstream>
 #include <streambuf>
 #include <string>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include "Shader.h"
+
+#include "IO/Keyboard.h"
+#include "IO/Mouse.h"
+#include "IO/Joystick.h"
 
 /*
 #include <glm/glm.hpp>
@@ -15,12 +29,14 @@
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void process_input(GLFWwindow* window);
-std::string loadShaderSrc(const char* filename);
+
+float mixVal = 0.5f;
+
+glm::mat4 transform = glm::mat4(1.0f);
+Joystick mainJ(0);
 
 int main()
 {
-	int success;
-	char infoLog[512];
 	
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -49,122 +65,33 @@ int main()
 
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+	glfwSetKeyCallback(window, Keyboard::keyCallback);
+
+	glfwSetCursorPosCallback(window, Mouse::cursorPosCallback);
+	glfwSetMouseButtonCallback(window, Mouse::mouseButtonCallback);
+	glfwSetScrollCallback(window, Mouse::mouseWheelCallback);
+
 	/*
 	* Shaders
 	*/
 
 	// compile vertex shader
-	unsigned int vertexShader;
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	std::string vertexShaderSrc = loadShaderSrc("assets/Vertex_core.glsl");
-	const GLchar* vertShader = vertexShaderSrc.c_str();
-	glShaderSource(vertexShader, 1, &vertShader, NULL);
-	glCompileShader(vertexShader);
-
-	// catch error
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		std::cout << "Error with vertex Shder Comp.: " << std::endl << infoLog << std::endl;
-	}
-
-	unsigned int fragmentShaders[2];
-
-	fragmentShaders[0] = glCreateShader(GL_FRAGMENT_SHADER);
-	std::string fragmentShaderSrc = loadShaderSrc("assets/Fragment_core.glsl");
-	const GLchar* fragShader = fragmentShaderSrc.c_str();
-	glShaderSource(fragmentShaders[0], 1, &fragShader, NULL);
-	glCompileShader(fragmentShaders[0]);
-
-	// catch error
-	glGetShaderiv(fragmentShaders[0], GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(fragmentShaders[0], 512, NULL, infoLog);
-		std::cout << "Error with Fragment Shder Comp.: " << std::endl << infoLog << std::endl;
-	}
-
-	fragmentShaders[1] = glCreateShader(GL_FRAGMENT_SHADER);
-	fragmentShaderSrc = loadShaderSrc("assets/Fragment_core2.glsl");
-	fragShader = fragmentShaderSrc.c_str();
-	glShaderSource(fragmentShaders[1], 1, &fragShader, NULL);
-	glCompileShader(fragmentShaders[1]);
-
-	// catch error
-	glGetShaderiv(fragmentShaders[1], GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(fragmentShaders[1], 512, NULL, infoLog);
-		std::cout << "Error with Fragment Shder Comp.: " << std::endl << infoLog << std::endl;
-	}
-
-	// Create Shader
-	unsigned int shaderPrograms[2];
-
-	shaderPrograms[0] = glCreateProgram();
-
-	glAttachShader(shaderPrograms[0], vertexShader);
-	glAttachShader(shaderPrograms[0], fragmentShaders[0]);
-	glLinkProgram(shaderPrograms[0]);
-
-	// catch errors
-	glGetProgramiv(shaderPrograms[0], GL_LINK_STATUS, &success);
-	if (!success)
-	{
-		glGetProgramInfoLog(shaderPrograms[0], 512, NULL, infoLog);
-		std::cout << "Linking error: " << std::endl << infoLog << std::endl;
-	}
-
-	shaderPrograms[1] = glCreateProgram();
-
-	glAttachShader(shaderPrograms[1], vertexShader);
-	glAttachShader(shaderPrograms[1], fragmentShaders[1]);
-	glLinkProgram(shaderPrograms[1]);
-
-	// catch errors
-	glGetProgramiv(shaderPrograms[1], GL_LINK_STATUS, &success);
-	if (!success)
-	{
-		glGetProgramInfoLog(shaderPrograms[1], 512, NULL, infoLog);
-		std::cout << "Linking error: " << std::endl << infoLog << std::endl;
-	}
-
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShaders[0]);
-	glDeleteShader(fragmentShaders[1]);
-
-	// Vertex Array
-	//float vertices[] =
-	//{
-	//	0.5f,	0.5f, 0.0f, // top right
-	//   -0.5f,	0.5f, 0.0f, // top left
-	//   -0.5f,  -0.5f, 0.0f, // bottom left
-	//	0.5f,  -0.5f, 0.0f // bottom right
-	//	
-	//};
-	//
-	//int indices[] =
-	//{
-	//	0, 1, 2,	// first triangle
-	//	2, 3, 0		// second triangle
-	//};
+	Shader shader("assets/Vertex_core.glsl", "assets/Fragment_core.glsl");
+	//Shader shader2("assets/Vertex_core.glsl", "assets/Fragment_core2.glsl");
+	
 
 	float vertices[] = {
-		// First Triangle
-		-0.5f, -0.5f, 0.0f,
-		-0.25f, 0.5f, 0.0f,
-		-0.1f, -0.5f, 0.0f,
+		// Position				Colors				Texture Coordinates
+		-0.5f, -0.5f,  0.0f,	1.0f, 1.0f, 0.5f,	0.0f, 0.0f, //botttom left
+		-0.5f,  0.5f,  0.0f,	0.5f, 1.0f, 0.75f,  0.0f, 1.0f, //bottom right
+		 0.5f,  -0.5f, 0.0f,	0.6f, 1.0f, 0.2f,   1.0f, 0.0f, //top left
+		 0.5f,	0.5f,  0.0f,	1.0f, 0.2f, 1.0f,   1.0f, 1.0f  //top riht
 
-		// Second Triangle
-		0.5f, -0.5f, 0.0f,
-		0.25f, 0.5f, 0.0f,
-		0.1f, -0.5f, 0.0f
 	};
 
 	unsigned int indices[] = {
 		0, 1, 2,
-		3, 4, 5
+		3, 1, 2
 	};
 
 
@@ -183,17 +110,101 @@ int main()
 	// GL_DYNAMIC_DRAW就正好相反
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	// Set Attribute Pointer
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-
 	// Set up EBO
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
+	// Set Attribute Pointer
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	// Color
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+
+	// Load and create a texture
+	unsigned int texture1, texture2;
+	glGenTextures(1, &texture1);
+	glBindTexture(GL_TEXTURE_2D, texture1);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	stbi_set_flip_vertically_on_load(true);
+
+	int width, height, nrChannels;
+	//unsigned char* data = stbi_load("assets/container.jpg", &width, &height, &nrChannels, 0);
+	unsigned char* data = stbi_load("assets/obama10.jpg", &width, &height, &nrChannels, 0);
+	if (data)
+	{
+		GLenum format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
+		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load texture" << std::endl;
+	}
+	stbi_image_free(data);
+
+	shader.activate();
+	//glUniform1i(glGetUniformLocation(shader.id, "texture1"), 0);
+	shader.setInt("texture1", 0);
+
+	glGenTextures(1, &texture2);
+	glBindTexture(GL_TEXTURE_2D, texture2);
+
+	data = stbi_load("assets/americanflag1_.png", &width, &height, &nrChannels, 0);
+
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load texture2" << std::endl;
+	}
+	stbi_image_free(data);
+	shader.setInt("texture2", 1);
+
+	
+	//glm::mat4 trans = glm::mat4(1.0f);
+	//trans = glm::rotate(trans, glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	//trans = glm::scale(trans, glm::vec3(0.5f, 1.5f, 0.5f));
+	//shader.activate();
+	//shader.setMat4("transform", trans);
+	
+
+	/*
+	glm::mat4 trans2 = glm::mat4(1.0f);
+	trans2 = glm::scale(trans2, glm::vec3(1.5f));
+	trans2 = glm::rotate(trans2, glm::radians(15.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	shader2.activate();
+	shader2.setMat4("transform", trans2);
+	*/
+	//glUseProgram(shaderPrograms[0]);
+	//glUniformMatrix4fv(glGetUniformLocation(shaderPrograms[0], "transform"), 1, GL_FALSE, glm::value_ptr(trans));
+
+	mainJ.update();
+	if (mainJ.isPresent())
+	{
+		std::cout << mainJ.getName() << "is present!!" << std::endl;
+	}
+	else
+	{
+		std::cout << "joystick not present!!" << std::endl;
+	}
+
+
 	while (!glfwWindowShouldClose(window))
 	{
-		// 2024/07/31看到了Tutorial 7 - Displaying Shapes的59:50 
+		// 2024/08/01看到了Tutorial 8 - Shaders/Transformations的15:03
 		// input
 		process_input(window);
 
@@ -201,16 +212,46 @@ int main()
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		glBindTexture(GL_TEXTURE_2D, texture1);
+
+		glActiveTexture(GL_TEXTURE0);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, texture2);
+		//glBindTexture(GL_TEXTURE_2D, texture1);
+
+		//trans = glm::rotate(trans, glm::radians((float)glfwGetTime() / 300.0f), glm::vec3(0.1f, 0.1f, 0.1f));
+		//glUniformMatrix4fv(glGetUniformLocation(shader.id, "transform"), 1, GL_FALSE, glm::value_ptr(trans));
+		//shader.activate();
+		//shader.setMat4("transform", trans);
+		
+
 		// Draw shapes
 		glBindVertexArray(VAO);
-
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		shader.activate();
+		shader.setFloat("mixVal", mixVal);
+		shader.setMat4("transform", transform);
+		glUniform1i(glGetUniformLocation(shader.id, "texture1"), 0);
 		// First triangle
-		glUseProgram(shaderPrograms[0]);
-		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+		//glUseProgram(shaderPrograms[0]);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		//glUniform1i(glGetUniformLocation(shader.id, "texture1"), 0);
+		//glUniform1i(glGetUniformLocation(shader.id, "texCoord"), 1);
+		//printf("%d \n", glGetUniformLocation(shader.id, "texture1"));
+		
+
+		//trans2 = glm::rotate(trans2, glm::radians((float)glfwGetTime() / -100.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		//shader2.activate();
+		//shader2.setMat4("transform", trans2);
+
+		//shader2.activate();
+		//glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void*)(3 * sizeof(GLuint)));
 
 		// Second Triangle
-		glUseProgram(shaderPrograms[1]);
-		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void*)(3 * sizeof(unsigned int)));
+		//glUseProgram(shaderPrograms[1]);
+		//glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void*)(3 * sizeof(float)));
+		glBindVertexArray(0);
 
 		// send new frame to window
 		glfwSwapBuffers(window);
@@ -218,7 +259,7 @@ int main()
 	}
 
 	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VAO);
+	glDeleteBuffers(1, &VBO);
 	glDeleteBuffers(1, &EBO);
 
 
@@ -234,33 +275,62 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 void process_input(GLFWwindow* window)
 {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	if (Keyboard::key(GLFW_KEY_ESCAPE))
 	{
 		glfwSetWindowShouldClose(window, true);
 	}
-}
 
-std::string loadShaderSrc(const char* filename)
-{
-	std::ifstream file;
-	std::stringstream buf;
-
-	std::string ret = "";
-
-	file.open(filename);
-
-	if (file.is_open())
+	// Change mix value
+	if (Keyboard::key(GLFW_KEY_UP))
 	{
-		buf << file.rdbuf();
-		ret = buf.str();
+		mixVal += 0.0005f;
+		if (mixVal > 1)
+		{
+			mixVal = 1.0f;
+		}
 	}
-	else
+	else if (Keyboard::key(GLFW_KEY_DOWN))
 	{
-		std::cout << "Could not open: " << filename << std::endl;
+		mixVal -= 0.0005f;
+		if (mixVal < 0)
+		{
+			mixVal = 0.0f;
+		}
 	}
-	
-	file.close();
+	/*if (Keyboard::key(GLFW_KEY_W))
+	{
+		transform = glm::translate(transform, glm::vec3(0.0f, 0.01f, 0.0f));
 
-	return ret;
+	}
+	else if (Keyboard::key(GLFW_KEY_S))
+	{
+		transform = glm::translate(transform, glm::vec3(0.0f, -0.01f, 0.0f));
+
+	}
+	else if (Keyboard::key(GLFW_KEY_A))
+	{
+		transform = glm::translate(transform, glm::vec3(-0.01f, 0.0f, 0.0f));
+
+	}
+	else if (Keyboard::key(GLFW_KEY_D))
+	{
+		transform = glm::translate(transform, glm::vec3(0.01f, 0.0f, 0.0f));
+
+	}*/
+
+	mainJ.update();
+
+	float lx = mainJ.axesStates(GLFW_JOYSTICK_AXES_LEFT_STICK_X);
+	float ly = -mainJ.axesStates(GLFW_JOYSTICK_AXES_LEFT_STICK_Y);
+
+	if (std::abs(lx) > 0.5f)
+	{
+		transform = glm::translate(transform, glm::vec3(lx / 10, 0.0f, 0.0f));
+
+	}
+	if (std::abs(ly) > 0.5f)
+	{
+		transform = glm::translate(transform, glm::vec3(0.0f, ly / 10, 0.0f));
+	}
 
 }
