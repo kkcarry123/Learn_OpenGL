@@ -19,7 +19,7 @@
 
 #include "IO/Keyboard.h"
 #include "IO/Mouse.h"
-#include "IO/Joystick.h"
+#include "IO/Gamepad.h"
 
 /*
 #include <glm/glm.hpp>
@@ -28,12 +28,12 @@
 */
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void process_input(GLFWwindow* window);
+void process_input(GLFWwindow* window/*, Gamepad& gamepad*/);
 
 float mixVal = 0.5f;
 
 glm::mat4 transform = glm::mat4(1.0f);
-Joystick mainJ(0);
+
 
 int main()
 {
@@ -79,7 +79,7 @@ int main()
 	Shader shader("assets/Vertex_core.glsl", "assets/Fragment_core.glsl");
 	//Shader shader2("assets/Vertex_core.glsl", "assets/Fragment_core2.glsl");
 	
-
+	/*
 	float vertices[] = {
 		// Position				Colors				Texture Coordinates
 		-0.5f, -0.5f,  0.0f,	1.0f, 1.0f, 0.5f,	0.0f, 0.0f, //botttom left
@@ -87,6 +87,52 @@ int main()
 		 0.5f,  -0.5f, 0.0f,	0.6f, 1.0f, 0.2f,   1.0f, 0.0f, //top left
 		 0.5f,	0.5f,  0.0f,	1.0f, 0.2f, 1.0f,   1.0f, 1.0f  //top riht
 
+	};
+	*/
+
+	float vertices[] = {
+		// Position				Texcorrds
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 	};
 
 	unsigned int indices[] = {
@@ -99,7 +145,7 @@ int main()
 	unsigned int VAO, VBO, EBO;
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
+	//glGenBuffers(1, &EBO);
 
 	// Bind VAO
 	glBindVertexArray(VAO);
@@ -111,19 +157,19 @@ int main()
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
 	// Set up EBO
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	// Set Attribute Pointer
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
 	// Color
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
+	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	//glEnableVertexAttribArray(1);
 
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 	// Load and create a texture
 	unsigned int texture1, texture2;
@@ -191,22 +237,27 @@ int main()
 	//glUseProgram(shaderPrograms[0]);
 	//glUniformMatrix4fv(glGetUniformLocation(shaderPrograms[0], "transform"), 1, GL_FALSE, glm::value_ptr(trans));
 
-	mainJ.update();
-	if (mainJ.isPresent())
+	// 检查是否有手柄连接
+	int joystickID = GLFW_JOYSTICK_1;
+	if (!glfwJoystickPresent(joystickID))
 	{
-		std::cout << mainJ.getName() << "is present!!" << std::endl;
+		std::cerr << "Joystick " << joystickID << " is not present" << std::endl;
+		//glfwTerminate();
+		//return -1;
 	}
 	else
 	{
-		std::cout << "joystick not present!!" << std::endl;
+		Gamepad gamepad(joystickID);
 	}
+
+	// 创建手柄对象
 
 
 	while (!glfwWindowShouldClose(window))
 	{
 		// 2024/08/01看到了Tutorial 8 - Shaders/Transformations的15:03
 		// input
-		process_input(window);
+		process_input(window/*, gamepad*/);
 
 		// rendering
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -235,15 +286,11 @@ int main()
 		glUniform1i(glGetUniformLocation(shader.id, "texture1"), 0);
 		// First triangle
 		//glUseProgram(shaderPrograms[0]);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 		//glUniform1i(glGetUniformLocation(shader.id, "texture1"), 0);
 		//glUniform1i(glGetUniformLocation(shader.id, "texCoord"), 1);
 		//printf("%d \n", glGetUniformLocation(shader.id, "texture1"));
-		
-
-		//trans2 = glm::rotate(trans2, glm::radians((float)glfwGetTime() / -100.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		//shader2.activate();
-		//shader2.setMat4("transform", trans2);
 
 		//shader2.activate();
 		//glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void*)(3 * sizeof(GLuint)));
@@ -260,7 +307,7 @@ int main()
 
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
-	glDeleteBuffers(1, &EBO);
+	//glDeleteBuffers(1, &EBO);
 
 
 	glfwTerminate();
@@ -273,8 +320,10 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-void process_input(GLFWwindow* window)
+void process_input(GLFWwindow* window/*, Gamepad& gamepad*/)
 {
+	//gamepad.update();
+
 	if (Keyboard::key(GLFW_KEY_ESCAPE))
 	{
 		glfwSetWindowShouldClose(window, true);
@@ -318,19 +367,15 @@ void process_input(GLFWwindow* window)
 
 	}*/
 
-	mainJ.update();
-
-	float lx = mainJ.axesStates(GLFW_JOYSTICK_AXES_LEFT_STICK_X);
-	float ly = -mainJ.axesStates(GLFW_JOYSTICK_AXES_LEFT_STICK_Y);
-
-	if (std::abs(lx) > 0.5f)
+	/*
+	if (gamepad.isButtonPressed(GLFW_GAMEPAD_BUTTON_A))
 	{
-		transform = glm::translate(transform, glm::vec3(lx / 10, 0.0f, 0.0f));
-
-	}
-	if (std::abs(ly) > 0.5f)
-	{
-		transform = glm::translate(transform, glm::vec3(0.0f, ly / 10, 0.0f));
+		std::cout << "Button A pressed" << std::endl;
 	}
 
+	float leftStickX = gamepad.getAxisValue(GLFW_GAMEPAD_AXIS_LEFT_X);
+	float leftStickY = gamepad.getAxisValue(GLFW_GAMEPAD_AXIS_LEFT_Y);
+
+	std::cout << "Left Stick X: " << leftStickX << ", Y: " << leftStickY << std::endl;
+	*/
 }

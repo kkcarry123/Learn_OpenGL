@@ -150,7 +150,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\IO\Joystick.cpp" />
+    <ClCompile Include="src\IO\Gamepad.cpp" />
     <ClCompile Include="src\IO\Mouse.cpp" />
     <ClCompile Include="src\IO\Keyboard.cpp" />
     <ClCompile Include="src\glad.c" />
@@ -164,7 +164,7 @@
     <None Include="glfw3.dll" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\IO\Joystick.h" />
+    <ClInclude Include="src\IO\Gamepad.h" />
     <ClInclude Include="src\IO\Mouse.h" />
     <ClInclude Include="src\IO\Keyboard.h" />
     <ClInclude Include="src\Shader.h" />

@@ -33,7 +33,7 @@
     <ClCompile Include="src\IO\Mouse.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\IO\Joystick.cpp">
+    <ClCompile Include="src\IO\Gamepad.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -55,7 +55,7 @@
     <ClInclude Include="src\IO\Mouse.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="src\IO\Joystick.h">
+    <ClInclude Include="src\IO\Gamepad.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
