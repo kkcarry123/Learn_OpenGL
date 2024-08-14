@@ -15,11 +15,17 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Shader.h"
+#include "Graphics/Shader.h"
+#include "Graphics/Texture.h"
+
+#include "Graphics/Models/Cube.hpp"
 
 #include "IO/Keyboard.h"
 #include "IO/Mouse.h"
 #include "IO/Gamepad.h"
+#include "IO/Camera.h"
+
+#include "Screen/Screen.h"
 
 /*
 #include <glm/glm.hpp>
@@ -28,11 +34,27 @@
 */
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void process_input(GLFWwindow* window/*, Gamepad& gamepad*/);
+void process_input(/*GLFWwindow* window,*/ double dt/*, Gamepad& gamepad*/);
+
+Screen screen;
 
 float mixVal = 0.5f;
 
 glm::mat4 transform = glm::mat4(1.0f);
+
+Camera cameras[2] = {
+	Camera(glm::vec3(0.0f, 0.0f, 3.0f)),
+	Camera(glm::vec3(10.0f, 10.0f, 10.0f))
+};
+int activeCam = 0;
+
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
+unsigned int SCR_WIDTH = 800, SCR_HEIGHT = 600;
+float x, y, z;
 
 
 int main()
@@ -43,16 +65,12 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow* window = glfwCreateWindow(800, 600, "My OpenGL Window", NULL, NULL);
-	if (window == NULL)
+	if (!screen.init())
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
 		return -1;
 	}
-
-	//Focus to this glfw window
-	glfwMakeContextCurrent(window);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
@@ -61,7 +79,10 @@ int main()
 		return -1;
 	}
 
-	glViewport(0, 0, 800, 600);
+	screen.setParameters();
+
+	/*
+	glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
@@ -71,75 +92,23 @@ int main()
 	glfwSetMouseButtonCallback(window, Mouse::mouseButtonCallback);
 	glfwSetScrollCallback(window, Mouse::mouseWheelCallback);
 
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+	glEnable(GL_DEPTH_TEST);
+	*/
+
 	/*
 	* Shaders
 	*/
 
 	// compile vertex shader
-	Shader shader("assets/Vertex_core.glsl", "assets/Fragment_core.glsl");
-	//Shader shader2("assets/Vertex_core.glsl", "assets/Fragment_core2.glsl");
-	
+	Shader shader("assets/object.vs", "assets/object.fs");
+
+	Cube cube(glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.75f));
+	cube.init();
+
 	/*
-	float vertices[] = {
-		// Position				Colors				Texture Coordinates
-		-0.5f, -0.5f,  0.0f,	1.0f, 1.0f, 0.5f,	0.0f, 0.0f, //botttom left
-		-0.5f,  0.5f,  0.0f,	0.5f, 1.0f, 0.75f,  0.0f, 1.0f, //bottom right
-		 0.5f,  -0.5f, 0.0f,	0.6f, 1.0f, 0.2f,   1.0f, 0.0f, //top left
-		 0.5f,	0.5f,  0.0f,	1.0f, 0.2f, 1.0f,   1.0f, 1.0f  //top riht
-
-	};
-	*/
-
-	float vertices[] = {
-		// Position				Texcorrds
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-	};
-
-	unsigned int indices[] = {
-		0, 1, 2,
-		3, 1, 2
-	};
-
+	
 
 
 	unsigned int VAO, VBO, EBO;
@@ -172,71 +141,18 @@ int main()
 	glEnableVertexAttribArray(1);
 
 	// Load and create a texture
-	unsigned int texture1, texture2;
-	glGenTextures(1, &texture1);
-	glBindTexture(GL_TEXTURE_2D, texture1);
+	//unsigned int texture1, texture2;
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	stbi_set_flip_vertically_on_load(true);
-
-	int width, height, nrChannels;
-	//unsigned char* data = stbi_load("assets/container.jpg", &width, &height, &nrChannels, 0);
-	unsigned char* data = stbi_load("assets/obama10.jpg", &width, &height, &nrChannels, 0);
-	if (data)
-	{
-		GLenum format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
-		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "Failed to load texture" << std::endl;
-	}
-	stbi_image_free(data);
+	Texture texture1("assets/obama10.jpg", "texture1");
+	texture1.load();
+	Texture texture2("assets/americanflag1_.png", "texture2");
+	texture2.load();
 
 	shader.activate();
-	//glUniform1i(glGetUniformLocation(shader.id, "texture1"), 0);
-	shader.setInt("texture1", 0);
-
-	glGenTextures(1, &texture2);
-	glBindTexture(GL_TEXTURE_2D, texture2);
-
-	data = stbi_load("assets/americanflag1_.png", &width, &height, &nrChannels, 0);
-
-	if (data)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "Failed to load texture2" << std::endl;
-	}
-	stbi_image_free(data);
-	shader.setInt("texture2", 1);
-
-	
-	//glm::mat4 trans = glm::mat4(1.0f);
-	//trans = glm::rotate(trans, glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	//trans = glm::scale(trans, glm::vec3(0.5f, 1.5f, 0.5f));
-	//shader.activate();
-	//shader.setMat4("transform", trans);
-	
-
-	/*
-	glm::mat4 trans2 = glm::mat4(1.0f);
-	trans2 = glm::scale(trans2, glm::vec3(1.5f));
-	trans2 = glm::rotate(trans2, glm::radians(15.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	shader2.activate();
-	shader2.setMat4("transform", trans2);
+	shader.setInt("texture1", texture1.id);
+	shader.setInt("texture2", texture2.id);
 	*/
-	//glUseProgram(shaderPrograms[0]);
-	//glUniformMatrix4fv(glGetUniformLocation(shaderPrograms[0], "transform"), 1, GL_FALSE, glm::value_ptr(trans));
-
+	
 	// 检查是否有手柄连接
 	int joystickID = GLFW_JOYSTICK_1;
 	if (!glfwJoystickPresent(joystickID))
@@ -247,66 +163,80 @@ int main()
 	}
 	else
 	{
+		// 创建手柄对象
 		Gamepad gamepad(joystickID);
 	}
 
-	// 创建手柄对象
 
 
-	while (!glfwWindowShouldClose(window))
+	while (!screen.shouldClose())
 	{
-		// 2024/08/01看到了Tutorial 8 - Shaders/Transformations的15:03
+		double currentTime = glfwGetTime();
+		deltaTime = currentTime - lastFrame;
+		lastFrame = currentTime;
 		// input
-		process_input(window/*, gamepad*/);
+		process_input(deltaTime/*, gamepad*/);
 
 		// rendering
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		screen.update();
 
-		glBindTexture(GL_TEXTURE_2D, texture1);
+		shader.activate();
+		shader.setFloat("mixVal", mixVal);
+		//glUniform1i(glGetUniformLocation(shader.id, "texture1"), 0);
+		//std::cout << "mixVal: " << glGetUniformLocation(shader.id, "texture0") << std::endl;
+		//std::cout << "mixVal: " << glGetUniformLocation(shader.id, "texture1") << std::endl;
 
+		/*
+		texture1.bind();
 		glActiveTexture(GL_TEXTURE0);
 
+
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texture2);
+		texture2.bind();
+		*/
+		//glBindTexture(GL_TEXTURE_2D, texture2.id);
 		//glBindTexture(GL_TEXTURE_2D, texture1);
 
 		//trans = glm::rotate(trans, glm::radians((float)glfwGetTime() / 300.0f), glm::vec3(0.1f, 0.1f, 0.1f));
 		//glUniformMatrix4fv(glGetUniformLocation(shader.id, "transform"), 1, GL_FALSE, glm::value_ptr(trans));
 		//shader.activate();
 		//shader.setMat4("transform", trans);
+
+		// create tranformation for screen
+		//glm::mat4 model = glm::mat4(1.0f);
+		glm::mat4 view = glm::mat4(1.0f);
+		glm::mat4 projection = glm::mat4(1.0f);
+
+		//model = glm::rotate(model, (float)glfwGetTime() * glm::radians(-55.0f), glm::vec3(0.5f));
+		//view = glm::translate(view, glm::vec3(-x, -y, -z));
+		//view = camera.getViewMatrix();
+		view = cameras[activeCam].getViewMatrix();
+		projection = glm::perspective(glm::radians(cameras[activeCam].getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 		
 
 		// Draw shapes
-		glBindVertexArray(VAO);
+		//glBindVertexArray(VAO);
 		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		shader.activate();
-		shader.setFloat("mixVal", mixVal);
-		shader.setMat4("transform", transform);
-		glUniform1i(glGetUniformLocation(shader.id, "texture1"), 0);
-		// First triangle
-		//glUseProgram(shaderPrograms[0]);
-		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		//shader.activate();
+
+		//shader.setMat4("model", model);
+		shader.setMat4("view", view);
+		shader.setMat4("projection", projection);
+
+		cube.render(shader);
+		//shader.setMat4("transform", transform);
 		//glUniform1i(glGetUniformLocation(shader.id, "texture1"), 0);
-		//glUniform1i(glGetUniformLocation(shader.id, "texCoord"), 1);
-		//printf("%d \n", glGetUniformLocation(shader.id, "texture1"));
 
-		//shader2.activate();
-		//glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void*)(3 * sizeof(GLuint)));
+		//glDrawArrays(GL_TRIANGLES, 0, 36);
 
-		// Second Triangle
-		//glUseProgram(shaderPrograms[1]);
-		//glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void*)(3 * sizeof(float)));
-		glBindVertexArray(0);
+		//glBindVertexArray(0);
 
 		// send new frame to window
-		glfwSwapBuffers(window);
-		glfwPollEvents();
+		screen.newFrame();
 	}
 
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
+	//glDeleteVertexArrays(1, &VAO);
+	//glDeleteBuffers(1, &VBO);
 	//glDeleteBuffers(1, &EBO);
 
 
@@ -318,15 +248,18 @@ int main()
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
+	SCR_WIDTH = width;
+	SCR_HEIGHT = height;
 }
 
-void process_input(GLFWwindow* window/*, Gamepad& gamepad*/)
+void process_input(/*GLFWwindow* window,*/ double dt/*, Gamepad& gamepad*/)
 {
 	//gamepad.update();
 
 	if (Keyboard::key(GLFW_KEY_ESCAPE))
 	{
-		glfwSetWindowShouldClose(window, true);
+		//glfwSetWindowShouldClose(window, true);
+		screen.setShouldClose(true);
 	}
 
 	// Change mix value
@@ -345,6 +278,62 @@ void process_input(GLFWwindow* window/*, Gamepad& gamepad*/)
 		{
 			mixVal = 0.0f;
 		}
+	}
+
+	if (Keyboard::keyWentDown(GLFW_KEY_TAB))
+	{
+		activeCam += (activeCam == 0) ? 1 : -1;
+	}
+
+	if (Keyboard::key(GLFW_KEY_W))
+	{
+		//y += 0.0005;
+		//camera.updateCameraPos(CameraDirection::FORWARD, dt);
+		cameras[activeCam].updateCameraPos(CameraDirection::FORWARD, dt);
+	}
+	else if (Keyboard::key(GLFW_KEY_S))
+	{
+		//y -= 0.0005;
+		//camera.updateCameraPos(CameraDirection::BACKWARD, dt);
+		cameras[activeCam].updateCameraPos(CameraDirection::BACKWARD, dt);
+	}
+	if (Keyboard::key(GLFW_KEY_A))
+	{
+		//x -= 0.0005;
+		//camera.updateCameraPos(CameraDirection::LEFT, dt);
+		cameras[activeCam].updateCameraPos(CameraDirection::LEFT, dt);
+	}
+	else if (Keyboard::key(GLFW_KEY_D))
+	{
+		//x += 0.0005;
+		//camera.updateCameraPos(CameraDirection::RIGHT, dt);
+		cameras[activeCam].updateCameraPos(CameraDirection::RIGHT, dt);
+	}
+	if (Keyboard::key(GLFW_KEY_SPACE))
+	{
+		//y += 0.0005;
+		//camera.updateCameraPos(CameraDirection::UP, dt);
+		cameras[activeCam].updateCameraPos(CameraDirection::UP, dt);
+	}
+	if (Keyboard::key(GLFW_KEY_LEFT_CONTROL))
+	{
+		//y += 0.0005;
+		//camera.updateCameraPos(CameraDirection::DOWN, dt);
+		cameras[activeCam].updateCameraPos(CameraDirection::DOWN, dt);
+	}
+
+	double dx = Mouse::getDX(), dy = Mouse::getDY();
+	if (dx != 0 || dy != 0)
+	{
+		//camera.updateCameraDirection(dx, dy);
+		cameras[activeCam].updateCameraDirection(dx, dy);
+	}
+
+	double scrollDy = Mouse::getScrollDY();
+	if (scrollDy != 0)
+	{
+		//camera.updateCameraZoom(scrollDy);
+		cameras[activeCam].updateCameraZoom(scrollDy);
 	}
 	/*if (Keyboard::key(GLFW_KEY_W))
 	{

@@ -150,25 +150,36 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Graphics\Objects\Mesh.cpp" />
+    <ClCompile Include="src\Graphics\Objects\Model.cpp" />
+    <ClCompile Include="src\Screen\Screen.cpp" />
+    <ClCompile Include="src\IO\Camera.cpp" />
     <ClCompile Include="src\IO\Gamepad.cpp" />
     <ClCompile Include="src\IO\Mouse.cpp" />
     <ClCompile Include="src\IO\Keyboard.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\Graphics\Shader.cpp" />
+    <ClCompile Include="src\Graphics\Texture.cpp" />
     <ClCompile Include="vendor\lib\stb.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="assets\Fragment_core.glsl" />
-    <None Include="assets\Vertex_core.glsl" />
+    <None Include="assets\object.fs" />
+    <None Include="assets\object.vs" />
     <None Include="glfw3.dll" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Graphics\Models\Cube.hpp" />
+    <ClInclude Include="src\Graphics\Objects\Mesh.h" />
+    <ClInclude Include="src\Graphics\Objects\Model.h" />
+    <ClInclude Include="src\Screen\Screen.h" />
+    <ClInclude Include="src\IO\Camera.h" />
     <ClInclude Include="src\IO\Gamepad.h" />
     <ClInclude Include="src\IO\Mouse.h" />
     <ClInclude Include="src\IO\Keyboard.h" />
-    <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\Graphics\Shader.h" />
     <ClInclude Include="src\stb_image.h" />
+    <ClInclude Include="src\Graphics\Texture.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

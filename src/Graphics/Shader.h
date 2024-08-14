@@ -16,7 +16,11 @@ class Shader
 public:
 	unsigned int id;
 
+    Shader();
+
 	Shader(const char* vertexShaderPath, const char* fragmentShaderPath);
+
+    void generate(const char* vertexShaderPath, const char* fragmentShaderPath);
 
 	// Utility Function
 	std::string loadShaderSrc(const char* filepath);

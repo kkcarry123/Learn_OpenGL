@@ -24,7 +24,7 @@
     <ClCompile Include="src\glad.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\Shader.cpp">
+    <ClCompile Include="src\Graphics\Shader.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\IO\Keyboard.cpp">
@@ -36,14 +36,29 @@
     <ClCompile Include="src\IO\Gamepad.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\IO\Camera.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Screen\Screen.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\Texture.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\Objects\Mesh.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\Objects\Model.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="glfw3.dll" />
-    <None Include="assets\Fragment_core.glsl" />
-    <None Include="assets\Vertex_core.glsl" />
+    <None Include="assets\object.fs" />
+    <None Include="assets\object.vs" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Shader.h">
+    <ClInclude Include="src\Graphics\Shader.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\stb_image.h">
@@ -56,6 +71,24 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\IO\Gamepad.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IO\Camera.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Screen\Screen.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Graphics\Texture.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Graphics\Objects\Mesh.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Graphics\Objects\Model.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Graphics\Models\Cube.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

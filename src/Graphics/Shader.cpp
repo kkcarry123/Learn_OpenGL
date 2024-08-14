@@ -1,6 +1,16 @@
 #include "Shader.h"
 
+Shader::Shader()
+{
+	
+}
+
 Shader::Shader(const char* vertexShaderPath, const char* fragmentShaderPath)
+{
+	generate(vertexShaderPath, fragmentShaderPath);
+}
+
+void Shader::generate(const char* vertexShaderPath, const char* fragmentShaderPath)
 {
 	int success;
 	char infoLog[512];
@@ -23,8 +33,6 @@ Shader::Shader(const char* vertexShaderPath, const char* fragmentShaderPath)
 
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragShader);
-
-
 }
 
 std::string Shader::loadShaderSrc(const char* filepath)
@@ -88,10 +96,10 @@ void Shader::setBool(const std::string& name, bool value)
 void Shader::setInt(const std::string& name, int value)
 {
 	glUniform1i(glGetUniformLocation(id, name.c_str()), value);
-	printf("id: %d \n",id);
-	printf("name: %s \n", name.c_str());
-	printf("value: %d \n", value);
-	printf("shader %d \n", glGetUniformLocation(id, "texture1"));
+	//printf("id: %d \n",id);
+	//printf("name: %s \n", name.c_str());
+	//printf("value: %d \n", value);
+	//printf("shader %d \n", glGetUniformLocation(id, "texture1"));
 }
 void Shader::setFloat(const std::string& name, float value) 
 {

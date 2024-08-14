@@ -26,6 +26,7 @@ void Mouse::cursorPosCallback(GLFWwindow* window, double _x, double _y)
 	{
 		Lastx = x;
 		Lasty = y;
+		firstMouse = false;
 	}
 
 	dx = x - Lastx;
