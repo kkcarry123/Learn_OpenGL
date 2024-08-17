@@ -75,6 +75,7 @@ GLuint Shader::compileShader(const char* filepath, GLenum type)
 	if (!success)
 	{
 		glGetShaderInfoLog(ret, 512, NULL, infoLog);
+		std::cout << "File path: " << filepath << std::endl;
 		std::cout << "Error with Fragment Shder Compilation.: " << std::endl << infoLog << std::endl;
 	}
 

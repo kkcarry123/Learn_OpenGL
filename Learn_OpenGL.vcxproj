@@ -150,6 +150,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Graphics\Rendering\Material.cpp" />
     <ClCompile Include="src\Graphics\Objects\Mesh.cpp" />
     <ClCompile Include="src\Graphics\Objects\Model.cpp" />
     <ClCompile Include="src\Screen\Screen.cpp" />
@@ -169,6 +170,8 @@
     <None Include="glfw3.dll" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Graphics\Models\Lamp.hpp" />
+    <ClInclude Include="src\Graphics\Rendering\Material.h" />
     <ClInclude Include="src\Graphics\Models\Cube.hpp" />
     <ClInclude Include="src\Graphics\Objects\Mesh.h" />
     <ClInclude Include="src\Graphics\Objects\Model.h" />

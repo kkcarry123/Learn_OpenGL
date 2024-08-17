@@ -51,6 +51,9 @@
     <ClCompile Include="src\Graphics\Objects\Model.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\Graphics\Rendering\Material.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="glfw3.dll" />
@@ -89,6 +92,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\Graphics\Models\Cube.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Graphics\Rendering\Material.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Graphics\Models\Lamp.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -14,9 +14,15 @@ std::vector<Vertex> Vertex::genList(float* vertices, int noVertices)
 			vertices[i * stride + 2]
 		);
 
-		ret[i].texCoord = glm::vec2(
+		ret[i].normal = glm::vec3(
 			vertices[i * stride + 3],
-			vertices[i * stride + 4]
+			vertices[i * stride + 4],
+			vertices[i * stride + 5]
+		);
+
+		ret[i].texCoord = glm::vec2(
+			vertices[i * stride + 6],
+			vertices[i * stride + 7]
 		);
 	}
 
@@ -44,8 +50,8 @@ void Mesh::render(Shader shader)
 		glActiveTexture(GL_TEXTURE0 + i + 1);
 		textures[i].bind();
 
-		std::cout << "textures " << i << " name: " << textures[i].name << "  ID: " << textures[i].id << std::endl;
-		std::cout << "GL_TEXTURE0 + i = " << GL_TEXTURE0 + i << std::endl;
+		//std::cout << "textures " << i << " name: " << textures[i].name << "  ID: " << textures[i].id << std::endl;
+		//std::cout << "GL_TEXTURE0 + i = " << GL_TEXTURE0 + i << std::endl;
 
 
 	}
@@ -82,9 +88,14 @@ void Mesh::setup()
 	// Vertex.position
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
-	// Vertex.texcoord
+	
+	// Vertex.normal
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoord));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+	
+	// Vertex.texcoord
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoord));
 
 
 	glBindVertexArray(0);
