@@ -12,6 +12,8 @@ public:
 
 	Material material;
 
+	Cube() {};
+
 	Cube(Material material, glm::vec3 pos, glm::vec3 size)
 		: material(material), pos(pos), size(size) {}
 
@@ -69,14 +71,17 @@ public:
 			indices[i] = i;
 		}
 		//Texture tex0("assets/obama10.jpg", "texture0");
-		Texture tex0("assets/americanflag1_.png", "texture1");
-		tex0.load();
+		//Texture tex0("assets/americanflag1_.png", "texture1");
+		Texture flag("assets/sovietflag.jpg", "material.diffuse");
+		Texture flagspec("assets/sovietflag.jpg", "material.specular");
+		flag.load();
+		flagspec.load();
 
 		//Texture tex1("assets/americanflag1_.png", "texture1");
-		Texture tex1("assets/obama10.jpg", "texture2");
-		tex1.load();
+		//Texture tex1("assets/obama10.jpg", "texture2");
+		//tex1.load();
 
-		meshes.push_back(Mesh(Vertex::genList(vertices, noVertices), indices, { tex0, tex1 }));
+		meshes.push_back(Mesh(Vertex::genList(vertices, noVertices), indices, { flag }));
 	}
 
 	void render(Shader shader)
@@ -88,8 +93,8 @@ public:
 		shader.setMat4("model", model);
 
 		shader.set3Float("material.ambient", material.ambient);
-		shader.set3Float("material.diffuse", material.diffuse);
-		shader.set3Float("material.specular", material.specular);
+		//shader.set3Float("material.diffuse", material.diffuse);
+		//shader.set3Float("material.specular", material.specular);
 		shader.setFloat("material.shininess", material.shininess);
 
 		Model::render(shader);

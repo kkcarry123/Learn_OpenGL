@@ -46,7 +46,7 @@ void Mesh::render(Shader shader)
 	for (unsigned int i = 0; i < textures.size(); i++)
 	{
 		shader.setInt(textures[i].name, textures[i].id);
-		//这块为啥+i再+1就好了？？？？明天看
+		//这块是因为binding a texture of id 0 from what i understand tells opengl you want to bind nothing.
 		glActiveTexture(GL_TEXTURE0 + i + 1);
 		textures[i].bind();
 

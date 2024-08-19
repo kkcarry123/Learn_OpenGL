@@ -86,6 +86,6 @@ void Texture::setWrap(GLenum s, GLenum t)
 
 void Texture::bind()
 {
-	std::cout << "BindTexture: " << id << std::endl;
+	//std::cout << "BindTexture: " << id << std::endl;
 	glBindTexture(GL_TEXTURE_2D, id);
 }
