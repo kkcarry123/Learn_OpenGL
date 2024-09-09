@@ -1,0 +1,11 @@
+Model Information:
+* title:	FN SCAR
+* source:	https://sketchfab.com/3d-models/fn-scar-27505cc08ae145b5952bd81664487bd4
+* author:	mohamed.amir94812 (https://sketchfab.com/mohamed.amir94812)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "FN SCAR" (https://sketchfab.com/3d-models/fn-scar-27505cc08ae145b5952bd81664487bd4) by mohamed.amir94812 (https://sketchfab.com/mohamed.amir94812) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

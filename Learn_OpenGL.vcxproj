@@ -171,6 +171,7 @@
     <None Include="glfw3.dll" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Graphics\Models\Gun.hpp" />
     <ClInclude Include="src\Graphics\Rendering\Light.h" />
     <ClInclude Include="src\Graphics\Models\Lamp.hpp" />
     <ClInclude Include="src\Graphics\Rendering\Material.h" />

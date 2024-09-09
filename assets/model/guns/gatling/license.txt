@@ -1,0 +1,11 @@
+Model Information:
+* title:	Gatling
+* source:	https://sketchfab.com/3d-models/gatling-9e46e481603d4031a49a9ae9a02ffc24
+* author:	Long Nguyễn (https://sketchfab.com/LongNguyen89)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Gatling" (https://sketchfab.com/3d-models/gatling-9e46e481603d4031a49a9ae9a02ffc24) by Long Nguyễn (https://sketchfab.com/LongNguyen89) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

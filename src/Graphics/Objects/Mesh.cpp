@@ -43,17 +43,29 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
 void Mesh::render(Shader shader)
 {
 	// Textures
+	unsigned int diffuseIdx = 0;
+	unsigned int specularIdx = 0;
 	for (unsigned int i = 0; i < textures.size(); i++)
 	{
-		shader.setInt(textures[i].name, textures[i].id);
-		//这块是因为binding a texture of id 0 from what i understand tells opengl you want to bind nothing.
-		glActiveTexture(GL_TEXTURE0 + i + 1);
+		// Activate texture
+		glActiveTexture(GL_TEXTURE0 + i);
+
+		// Retrieve texture info
+		std::string name;
+		switch(textures[i].type)
+		{
+			case aiTextureType_DIFFUSE:
+				name = "diffuse" + std::to_string(diffuseIdx++);
+				break;
+			case aiTextureType_SPECULAR:
+				name = "specular" + std::to_string(specularIdx++);
+				break;
+		}
+
+		// Set the shader value
+		shader.setInt(name, i);
+		// Bind texture
 		textures[i].bind();
-
-		//std::cout << "textures " << i << " name: " << textures[i].name << "  ID: " << textures[i].id << std::endl;
-		//std::cout << "GL_TEXTURE0 + i = " << GL_TEXTURE0 + i << std::endl;
-
-
 	}
 
 	glBindVertexArray(VAO);

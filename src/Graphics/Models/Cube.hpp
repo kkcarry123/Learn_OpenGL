@@ -12,10 +12,8 @@ public:
 
 	Material material;
 
-	Cube() {};
-
-	Cube(Material material, glm::vec3 pos, glm::vec3 size)
-		: material(material), pos(pos), size(size) {}
+	Cube(glm::vec3 pos = glm::vec3(0.0f), glm::vec3 size = glm::vec3(1.0f))
+		: Model(pos, size) {};
 
 	void init()
 	{
@@ -70,20 +68,23 @@ public:
 		{
 			indices[i] = i;
 		}
+		/*
 		//Texture tex0("assets/obama10.jpg", "texture0");
 		//Texture tex0("assets/americanflag1_.png", "texture1");
 		Texture flag("assets/sovietflag.jpg", "material.diffuse");
 		Texture flagspec("assets/sovietflag.jpg", "material.specular");
 		flag.load();
 		flagspec.load();
+		*/
 
 		//Texture tex1("assets/americanflag1_.png", "texture1");
 		//Texture tex1("assets/obama10.jpg", "texture2");
 		//tex1.load();
 
-		meshes.push_back(Mesh(Vertex::genList(vertices, noVertices), indices, { flag }));
+		meshes.push_back(Mesh(Vertex::genList(vertices, noVertices), indices));
 	}
 
+	/*
 	void render(Shader shader)
 	{
 		glm::mat4 model = glm::mat4(1.0f);
@@ -99,6 +100,6 @@ public:
 
 		Model::render(shader);
 	}
-
+	*/
 
 };

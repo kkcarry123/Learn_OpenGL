@@ -17,9 +17,11 @@
 
 #include "Graphics/Shader.h"
 #include "Graphics/Texture.h"
+#include "Graphics/Objects/Model.h"
 
 #include "Graphics/Models/Cube.hpp"
 #include "Graphics/Models/Lamp.hpp"
+#include "Graphics/Models/Gun.hpp"
 
 #include "Graphics/Rendering/Light.h"
 
@@ -50,7 +52,10 @@ Camera cameras[2] = {
 };
 int activeCam = 0;
 
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 0.0f));
+
+// setup camera 
+Camera Camera::defaultCamera(glm::vec3(0.0f, 0.0f, 0.0f));
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -91,24 +96,15 @@ int main()
 	Shader shader("assets/object.vs", "assets/object.fs");
 	Shader lampShader("assets/object.vs", "assets/lamp.fs");
 
-	glm::vec3 cubePositions[] = {
-		glm::vec3(0.0f,  0.0f,  0.0f),
-		glm::vec3(2.0f,  5.0f, -15.0f),
-		glm::vec3(-1.5f, -2.2f, -2.5f),
-		glm::vec3(-3.8f, -2.0f, -12.3f),
-		glm::vec3(2.4f, -0.4f, -3.5f),
-		glm::vec3(-1.7f,  3.0f, -7.5f),
-		glm::vec3(1.3f, -2.0f, -2.5f),
-		glm::vec3(1.5f,  2.0f, -2.5f),
-		glm::vec3(1.5f,  0.2f, -1.5f),
-		glm::vec3(-1.3f,  1.0f, -1.5f)
-	};
+	Model m(glm::vec3(0.0f, 0.0f, -5.0f), glm::vec3(0.5f));
+	//m.loadModel("assets/model/source/kanna.gltf");
+	// ци”г
+	//m.loadModel("assets/model/scene.gltf");
+	m.loadModel("assets/model/guns/p90/scene.gltf");
 
-	Cube cubes[10];
-	for (unsigned int i = 0; i < 10; i++) {
-		cubes[i] = Cube(Material::gold, cubePositions[i], glm::vec3(1.0f));
-		cubes[i].init();
-	}
+	Gun g;
+	g.loadModel("assets/model/guns/p90/scene.gltf");
+
 
 	glm::vec3 pointLightPositions[] = {
 			glm::vec3(0.7f,  0.2f,  2.0f),
@@ -210,10 +206,7 @@ int main()
 		shader.setMat4("view", view);
 		shader.setMat4("projection", projection);
 
-		for (int i = 0; i < 10; i++)
-		{
-			cubes[i].render(shader);
-		}
+		g.render(shader);
 
 		lampShader.activate();
 		lampShader.setMat4("view", view);
@@ -226,10 +219,9 @@ int main()
 		
 		screen.newFrame();
 	}
-	for (int i = 0; i < 10; i++)
-	{
-		cubes[i].cleanup();
-	}
+
+	g.cleanup();
+
 	for (int i = 0; i < 4; i++)
 	{
 		lamps[i].cleanup();

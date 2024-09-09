@@ -106,5 +106,8 @@
     <ClInclude Include="src\Graphics\Rendering\Light.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="src\Graphics\Models\Gun.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

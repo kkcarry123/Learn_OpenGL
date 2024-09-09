@@ -2,12 +2,16 @@
 
 struct Material {
 	vec3 ambient;
-	//vec3 diffuse; //ÂþÉä¹â
-	sampler2D diffuse; //ÂþÉä¹â
-	//vec3 specular;
-	sampler2D specular;
+	vec3 diffuse; //ÂþÉä¹â
+	//sampler2D diffuse; //ÂþÉä¹â
+	vec3 specular;
+	//sampler2D specular;
 	float shininess;
 };
+
+uniform sampler2D diffuse0;
+uniform sampler2D specular0;
+
 
 struct DirLight {
 	vec3 direction;
@@ -88,8 +92,8 @@ vec3 calcSpotLight(int idx, vec3 norm, vec3 viewDir, vec3 diffMap, vec3 specMap)
 void main() {
 	vec3 norm = normalize(Normal);
 	vec3 viewDir = normalize(viewPos - FragPos);
-	vec3 diffMap = vec3(texture(material.diffuse, TexCoord));
-	vec3 specMap = vec3(texture(material.specular, TexCoord));
+	vec3 diffMap = vec3(texture(diffuse0, TexCoord));
+	vec3 specMap = vec3(texture(specular0, TexCoord));
 
 	// Placeholder
 	vec3 result;

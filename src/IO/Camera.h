@@ -3,6 +3,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+
+
 enum class CameraDirection
 {
 	NONE = 0,
@@ -26,6 +28,8 @@ public:
 
 	glm::vec3 worldUp;
 
+	
+	static Camera defaultCamera;
 
 	float yaw;
 	float pitch;
@@ -41,6 +45,8 @@ public:
 	float getZoom();
 
 	glm::mat4 getViewMatrix();
+
+	
 
 private:
 	void updateCameraVectors();
