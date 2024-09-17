@@ -150,6 +150,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Physics\Environment.cpp" />
+    <ClCompile Include="src\Physics\RigidBody.cpp" />
     <ClCompile Include="src\Graphics\Rendering\Light.cpp" />
     <ClCompile Include="src\Graphics\Rendering\Material.cpp" />
     <ClCompile Include="src\Graphics\Objects\Mesh.cpp" />
@@ -171,7 +173,11 @@
     <None Include="glfw3.dll" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Graphics\Models\ModelArray.hpp" />
+    <ClInclude Include="src\Physics\Environment.h" />
+    <ClInclude Include="src\Physics\RigidBody.h" />
     <ClInclude Include="src\Graphics\Models\Gun.hpp" />
+    <ClInclude Include="src\Graphics\Models\Sphere.hpp" />
     <ClInclude Include="src\Graphics\Rendering\Light.h" />
     <ClInclude Include="src\Graphics\Models\Lamp.hpp" />
     <ClInclude Include="src\Graphics\Rendering\Material.h" />

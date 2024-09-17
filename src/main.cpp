@@ -10,6 +10,8 @@
 #include <sstream>
 #include <streambuf>
 #include <string>
+#include <vector>
+#include <stack>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -22,6 +24,7 @@
 #include "Graphics/Models/Cube.hpp"
 #include "Graphics/Models/Lamp.hpp"
 #include "Graphics/Models/Gun.hpp"
+#include "Graphics/Models/Sphere.hpp"
 
 #include "Graphics/Rendering/Light.h"
 
@@ -29,6 +32,8 @@
 #include "IO/Mouse.h"
 #include "IO/Gamepad.h"
 #include "IO/Camera.h"
+
+#include "Physics/Environment.h"
 
 #include "Screen/Screen.h"
 
@@ -64,6 +69,10 @@ unsigned int SCR_WIDTH = 800, SCR_HEIGHT = 600;
 float x, y, z;
 
 bool flashLightOn = true;
+
+//std::vector<Sphere> launchObjects;
+SphereArray launchObjects;
+
 
 int main()
 {
@@ -102,9 +111,12 @@ int main()
 	//m.loadModel("assets/model/scene.gltf");
 	m.loadModel("assets/model/guns/p90/scene.gltf");
 
-	Gun g;
-	g.loadModel("assets/model/guns/p90/scene.gltf");
-
+	//Gun g;
+	//g.loadModel("assets/model/guns/p90/scene.gltf");
+	
+	//sphere.init();
+	//sphere.rb.applyAcceleration(Environment::gravitationalAcceleration);
+	launchObjects.init();
 
 	glm::vec3 pointLightPositions[] = {
 			glm::vec3(0.7f,  0.2f,  2.0f),
@@ -112,14 +124,34 @@ int main()
 			glm::vec3(-4.0f,  2.0f, -12.0f),
 			glm::vec3(0.0f,  0.0f, -3.0f)
 	};
+
+	glm::vec4 ambient = glm::vec4(0.05f, 0.05f, 0.05f, 1.0f);
+	glm::vec4 diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 1.0f);
+	glm::vec4 specular = glm::vec4(1.0f);
+
+	float k0 = 1.0f;
+	float k1 = 0.09f;
+	float k2 = 0.032f;
+
 	Lamp lamps[4];
 	for (unsigned int i = 0; i < 4; i++) {
 		lamps[i] = Lamp(glm::vec3(1.0f),
-			glm::vec3(0.05f), glm::vec3(0.8f), glm::vec3(1.0f),
-			1.0f, 0.07f, 0.032f,
+			ambient, diffuse, specular,
+			k0, k1, k2,
 			pointLightPositions[i], glm::vec3(0.25f));
 		lamps[i].init();
 	}
+	//LampArray lamps;
+	//lamps.init();
+	//for (unsigned int i = 0; i < 4; i++)
+	//{
+	//	lamps.lightInstances.push_back({
+	//		pointLightPositions[i],
+	//		k0, k1, k2,
+	//		ambient, diffuse, specular
+	//		});
+	//}
+
 
 
 	//Cube cube(Material::gold, glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.75f));
@@ -176,9 +208,10 @@ int main()
 			glm::vec4(dirLight.direction, 1.0f));
 		dirLight.render(shader);
 
-		for (int i = 0; i < 4; i++)
+		for (unsigned int i = 0; i < 4; i++)
 		{
 			lamps[i].pointLight.render(shader, i);
+			//lamps.lightInstances[i].render(shader, i);
 		}
 		shader.setInt("noPointLights", 4);
 
@@ -206,31 +239,56 @@ int main()
 		shader.setMat4("view", view);
 		shader.setMat4("projection", projection);
 
-		g.render(shader);
+		std::stack<int> removeObjects;
+		for (int i = 0; i < launchObjects.instances.size(); i++)
+		{
+			if (glm::length(Camera::defaultCamera.cameraPos - launchObjects.instances[i].pos) > 50.0f)
+			{
+				removeObjects.push(i);
+				continue;
+			}
+		}
+
+		for (int i = 0; i < removeObjects.size(); i++)
+		{
+			launchObjects.instances.erase(launchObjects.instances.begin() + removeObjects.top());
+			removeObjects.pop();
+		}
+
+		if (launchObjects.instances.size() > 0)
+		{
+			launchObjects.render(shader, deltaTime);
+		}
 
 		lampShader.activate();
 		lampShader.setMat4("view", view);
 		lampShader.setMat4("projection", projection);
 		for (int i = 0; i < 4; i++)
 		{
-			lamps[i].render(lampShader);
+			lamps[i].render(lampShader, deltaTime);
+			//lamps.render(lampShader, deltaTime);
 		}
 
 		
 		screen.newFrame();
+		//glfwPollEvents();
 	}
+	launchObjects.cleanup();
 
-	g.cleanup();
-
-	for (int i = 0; i < 4; i++)
-	{
-		lamps[i].cleanup();
-	}
+	//lamps.cleanup();
 
 
 	glfwTerminate();
 
 	return 0;
+}
+
+void launchItem(float dt)
+{
+	RigidBody rb(1.0f, Camera::defaultCamera.cameraPos);
+	rb.applyImpulse(Camera::defaultCamera.cameraFront, 1000.0f, dt);
+	rb.applyAcceleration(Environment::gravitationalAcceleration);
+	launchObjects.instances.push_back(rb);
 }
 
 void process_input(/*GLFWwindow* window,*/ double dt/*, Gamepad& gamepad*/)
@@ -320,6 +378,11 @@ void process_input(/*GLFWwindow* window,*/ double dt/*, Gamepad& gamepad*/)
 	{
 		//camera.updateCameraZoom(scrollDy);
 		cameras[activeCam].updateCameraZoom(scrollDy);
+	}
+
+	if (Keyboard::keyWentDown(GLFW_KEY_F))
+	{
+		launchItem(deltaTime);
 	}
 	/*if (Keyboard::key(GLFW_KEY_W))
 	{

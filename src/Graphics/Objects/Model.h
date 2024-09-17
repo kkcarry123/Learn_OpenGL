@@ -14,21 +14,26 @@
 
 #include "Mesh.h"
 
+#include "../../Physics/Rigidbody.h"
+#include "../../Physics/Environment.h"
+
 class Model
 {
 
 public:
-	glm::vec3 pos;
+	RigidBody rb;
+	//glm::vec3 pos;
 	glm::vec3 size;
+	bool noTex;
 	
 
 	//Model();
-	Model(glm::vec3 pos = glm::vec3(0.0f), glm::vec3 size = glm::vec3(1.0f));
+	Model(glm::vec3 pos = glm::vec3(0.0f), glm::vec3 size = glm::vec3(1.0f), bool noTex = false);
 
 	void init();
 	void loadModel(std::string path);
 
-	void render(Shader shader, bool setModel = true);
+	void render(Shader shader, float dt, bool setModel = true);
 
 	void cleanup();
 

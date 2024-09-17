@@ -11,13 +11,13 @@ public:
 		: Model(glm::vec3(0.0f), glm::vec3(0.5f)) 
 	{}
 
-	void render(Shader shader, bool setModel = false)
+	void render(Shader shader, float dt, bool setModel = false)
 	{
 		glm::mat4 model = glm::mat4(1.0f);
 
 		// Set position
-		pos = Camera::defaultCamera.cameraPos + glm::vec3(Camera::defaultCamera.cameraFront * 8.0f) + glm::vec3(Camera::defaultCamera.cameraUp * -3.15f);
-		model = glm::translate(model, pos);
+		rb.pos = Camera::defaultCamera.cameraPos + glm::vec3(Camera::defaultCamera.cameraFront * 8.0f) + glm::vec3(Camera::defaultCamera.cameraUp * -3.15f);
+		model = glm::translate(model, rb.pos);
 
 		float theta;
 
@@ -29,7 +29,7 @@ public:
 
 		// Rotate around cameraUp using dot product
 		glm::vec2 front2d = glm::vec2(Camera::defaultCamera.cameraFront.x, Camera::defaultCamera.cameraFront.z);
-		float theta = acos(glm::dot(glm::vec2(1.0f, 0.0f), front2d) / glm::length(front2d));
+		theta = acos(glm::dot(glm::vec2(1.0f, 0.0f), front2d) / glm::length(front2d));
 		model = glm::rotate(model, Camera::defaultCamera.cameraFront.z < 0 ? theta : -theta, Camera::defaultCamera.cameraUp);
 
 		// Rotate around camera right using dot product
@@ -54,7 +54,7 @@ public:
 
 		shader.setMat4("model", model);
 
-		Model::render(shader, setModel);
+		Model::render(shader, dt, setModel);
 
 
 	}

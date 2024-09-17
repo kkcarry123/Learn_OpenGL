@@ -57,6 +57,12 @@
     <ClCompile Include="src\Graphics\Rendering\Light.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\Physics\RigidBody.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\Environment.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="glfw3.dll" />
@@ -107,6 +113,18 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\Graphics\Models\Gun.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Graphics\Models\Sphere.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Physics\RigidBody.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Physics\Environment.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Graphics\Models\ModelArray.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -7,10 +7,11 @@ Model::Model()
 }
 */
 
-Model::Model(glm::vec3 pos, glm::vec3 size)
-	: pos(pos), size(size)
+Model::Model(glm::vec3 pos, glm::vec3 size, bool noTex)
+	: size(size), noTex(noTex)
 {
-
+	rb.pos = pos;
+	//rb.acceleration = Environment::gravitationalAcceleration;
 }
 
 void Model::init()
@@ -33,12 +34,14 @@ void Model::loadModel(std::string path)
 	processNode(scene->mRootNode, scene);
 }
 
-void Model::render(Shader shader, bool setModel)
+void Model::render(Shader shader, float dt, bool setModel)
 {
+	rb.update(dt);
+
 	if (setModel)
 	{
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, pos);
+		model = glm::translate(model, rb.pos);
 		model = glm::scale(model, size);
 		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 90.0f, 0.0f));
 		shader.setMat4("model", model);
